@@ -1,0 +1,211 @@
+Mô tả trang web:
+
+
+- tạo ra một trang web có thể giúp người dùng tương tác với một shop bán hàng:
+
+User:
+    + Đăng ký tài khoản trên web của shop.
+    + xem sản phẩm
+    + mua sản phẩm
+    + lựa sản phẩm bỏ vào giỏ hàng.
+    + Chọn các sản phẩm yêu thích.
+    + xem các bài post mới của shop.
+    + thanh toán các sản phẩm thông qua thẻ hoặc tiền mặt trực tiếp.
+    + người dùng có thể đánh giá cho những món hàn và đặt câu hỏi.
+    + người dùng có thể đặt câu hỏi cho shop ( 'shop có bán bánh không chẳn hạn!).
+
+    _______________________________________________
+
+
+
+Admin - chủ shop:
+
+    - tạo ra một web giúp admin hay chủ shop có thể :
+        + quản lý được sản phẩm: thêm, sửa, xóa, xem sản phẩm.
+        + quản lý được người dùng trên trang: 
+            - xóa người dùng ->> có thể làm một cách tự động nếu người dùng không đăng nhập quá lâu thì tài khoản sẽ tự động bị xóa.
+            - block người dùng 
+                + nếu người dùng có trang thái đặt hàng mà không nhận (boom hàng) thì trực tiếp block người dùng và gửi về một email. cho người dùng theo ý.
+            - xem số lượng sản phẩm mà người dùng đã mua. xem thông tin người dùng.
+            - nếu mà người mua nhiều hàng thì sẽ bật là tích topFan. 
+            - 
+
+
+
+
+
+Yêu cầu để có thể tạo web:
+
+    Phần giao diên:
+        - chỉ sử dụng css hoặc scss cho phần style. -> học scss.
+        - dùng reactjs. và các thư viện hổ trợ.
+
+    
+
+    Phần Data backbone.
+        Yêu cầu trong truy xuất data.
+        - chỉ có tài khoản admin mới có thể lấy được quyền xóa sữa các sản phẩm.
+        - chỉ có admin (chủ shop) có thể xóa người dùng, block người dùng.
+        - chỉ admin( chủ shop ) được quyền post các bài mới về các sản phẩm mới cho web mình.
+        - 
+
+
+
+
+
+
+
+
+
+thành phần có trong web:
+
+    admin:
+        + email
+        + password
+        + address
+        + image
+        + phone
+
+    customer: 
+        + email
+        + username
+        + password
+        + address
+        + image
+        + phone
+    guest:
+
+
+____ Quyền của các đối tượng trong trang web:
+
+    Admin:
+    - thêm, sữa, xóa sản phẩm.
+    - xóa người dùng.
+    - kiểm tra thông tin người dùng:
+        + lượng hàng hóa mà họ đã mua.
+        + tổng số sản phẩm trong shopping cart.
+        + tổng tiền mà họ đã chi để mua hàng của shop.
+    - đăng bài post về các sản phẩm mới.
+    - rep comment cảu customer, trả lời thắc mắc của người dùng.
+    - gửi email cho người dùng về các trường hợp cần thiết.
+
+
+    customer:
+        - xem web, các sản phẩm.
+        - mua hàng.
+        - chọn phương thức thanh toán, trả tiền.
+        - thêm hàng vào giỏ hàng.
+        - đánh giá hàng.
+        - đặt câu hỏi cho shop.
+        - bình luận dặt câu hỏi cho sản phẩm đó.
+        - 
+
+
+    gest :
+        - xem sản phẩm.
+        - đăng ký, login.
+        - xem các comment của những người khác trên trang web.
+
+
+
+Các bảng và thuộc tính có trong web.
+
+                   
+    ______________role__________________
+        id                      |integer|
+        name                    |string |
+    ------------------------------------
+
+    ______________category_______________
+        id                      |integer|
+        name                    |string |
+    ------------------------------------
+
+
+    ______________user_____________________________
+    id                      |integer        |     |
+    username                |string         |     
+    email                   |string         |
+    password                |string         |
+    address                 |string         | null|
+    phone                   |string         | null|
+    role_id                 |integer        | 
+    status                  |boolean        | null|
+    tick                    |boolean        | null|
+    -----------------------------------------------
+
+
+
+     
+    ______________product____________
+    id                      |integer|
+    name                    |string |
+    price                   |integer|
+    description             |string | null 
+    status                  |boolean| null
+    quantity                |integer| null
+    category_id             |integer| 
+    ---------------------------------
+
+
+    _____________ product_image _________
+    id                      |integer|
+    image_path              |string |null
+    description             |string | null 
+    product_id              |integer|
+    ---------------------------------
+
+
+
+
+
+---------------- 
+role:
+
+Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
+
+
+user:
+Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('role_id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->string('address');
+            $table->string('phone')->nullable();
+            $table->boolean('status')->default(true)->nullable();
+            $table->boolean('tick')->default(false)->nullable();
+            $table->rememberToken();
+            $table->timestamps();
+            $table->foreign('role_id')->references('id')->on('roles');
+        });
+
+
+post :
+     Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->string('content',255)->nullable();
+            $table->integer('like')->default(0)->nullable();
+            $table->integer('dislike')->default(0)->nullable();
+            $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('product_id')->references('id')->on('products');
+        });
+comment:
+         Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('content');
+            $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users');
+        });
+
+
