@@ -18,7 +18,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created 
      */
     public function store(RequestsProductRequest $request)
     {
